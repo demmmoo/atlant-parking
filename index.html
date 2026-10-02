@@ -1,0 +1,827 @@
+<title>Атлант Паркинг</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#eef1f2;
+  --surface:#ffffff;
+  --surface-2:#e3e9eb;
+  --border:#d3dadd;
+  --ink:#121a1f;
+  --ink-dim:#58656c;
+  --brand:#104b43;
+  --brand-ink:#ffffff;
+  --accent:#1f7a8c;
+  --accent-ink:#ffffff;
+  --free:#1a7a48;
+  --free-bg:#e1f3e8;
+  --busy:#b23b2c;
+  --busy-bg:#fbe7e3;
+  --warn:#8a6209;
+  --warn-bg:#f8efd7;
+  --focus:#1f7a8c;
+  --shadow:0 1px 2px rgba(15,25,30,.07), 0 6px 16px rgba(15,25,30,.09);
+  --font-display:'Manrope','Segoe UI',sans-serif;
+  --font-body:'IBM Plex Sans','Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono','Consolas',monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1416; --surface:#162025; --surface-2:#1c2a2e; --border:#2d3e43;
+    --ink:#eef4f4; --ink-dim:#9db0b4; --brand:#45b89f; --brand-ink:#06211c;
+    --accent:#5fc6da; --accent-ink:#06252b;
+    --free:#56d08c; --free-bg:#163325; --busy:#ff9484; --busy-bg:#3a1f1b;
+    --warn:#e7bd62; --warn-bg:#3a2f15; --focus:#5fc6da;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 6px 20px rgba(0,0,0,.5);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1416; --surface:#162025; --surface-2:#1c2a2e; --border:#2d3e43;
+  --ink:#eef4f4; --ink-dim:#9db0b4; --brand:#45b89f; --brand-ink:#06211c;
+  --accent:#5fc6da; --accent-ink:#06252b;
+  --free:#56d08c; --free-bg:#163325; --busy:#ff9484; --busy-bg:#3a1f1b;
+  --warn:#e7bd62; --warn-bg:#3a2f15; --focus:#5fc6da;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 6px 20px rgba(0,0,0,.5);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  padding-inline:16px;
+  min-height:100%;
+}
+.page{max-width:640px;margin-inline:auto;padding-block:24px 48px;display:flex;flex-direction:column;gap:18px;}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;}
+p{margin:0;}
+button{font-family:inherit;}
+*:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important;}}
+
+[hidden]{display:none!important;}
+
+/* ---------- auth screens ---------- */
+.auth-screen{min-height:70vh;display:flex;align-items:center;justify-content:center;padding-block:40px;}
+.auth-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  box-shadow:var(--shadow);padding:28px 24px;width:100%;max-width:380px;
+  display:flex;flex-direction:column;gap:16px;
+}
+.auth-kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);}
+.auth-card h1{font-size:22px;font-weight:800;color:var(--brand);}
+.auth-card p.lead{color:var(--ink-dim);font-size:14px;line-height:1.5;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:13px;font-weight:600;color:var(--ink-dim);}
+.field input{
+  font-family:var(--font-body);font-size:16px;padding:11px 12px;border-radius:10px;
+  border:1px solid var(--border);background:var(--bg);color:var(--ink);width:100%;
+}
+.field input:focus{border-color:var(--accent);}
+.field .hint{font-size:12px;color:var(--ink-dim);}
+.btn{
+  font-family:var(--font-display);font-weight:700;font-size:15px;border:none;border-radius:10px;
+  padding:12px 16px;cursor:pointer;color:var(--brand-ink);background:var(--brand);
+}
+.btn:disabled{opacity:.55;cursor:not-allowed;}
+.btn.secondary{background:transparent;color:var(--accent);border:1px solid var(--border);}
+.btn.small{padding:7px 12px;font-size:13px;border-radius:8px;}
+.form-error{font-size:13px;color:var(--busy);min-height:1em;}
+
+/* ---------- main app ---------- */
+#screen-main{display:flex;flex-direction:column;gap:16px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:4px;}
+.brand{display:flex;flex-direction:column;}
+.brand .name{font-size:17px;font-weight:800;color:var(--brand);}
+.brand .sub{font-size:12px;color:var(--ink-dim);}
+.apt-chip{
+  font-family:var(--font-mono);font-weight:600;font-size:13px;background:var(--surface-2);
+  border:1px solid var(--border);border-radius:999px;padding:6px 12px;color:var(--ink);
+}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+
+.tabs{display:flex;gap:6px;background:var(--surface-2);border-radius:12px;padding:4px;}
+.tab-btn{
+  flex:1;text-align:center;padding:9px 8px;border-radius:9px;border:none;background:transparent;
+  font-weight:600;font-size:14px;color:var(--ink-dim);cursor:pointer;
+}
+.tab-btn[aria-selected="true"]{background:var(--surface);color:var(--brand);box-shadow:var(--shadow);}
+.tab-btn .badge{font-family:var(--font-mono);font-size:11px;margin-left:4px;color:var(--accent);}
+
+.alert{border-radius:10px;padding:11px 14px;font-size:14px;line-height:1.45;display:flex;gap:10px;align-items:flex-start;justify-content:space-between;}
+.alert-error{background:var(--busy-bg);color:var(--busy);}
+.alert-warn{background:var(--warn-bg);color:var(--warn);}
+.alert-success{background:var(--free-bg);color:var(--free);}
+.alert-info{background:var(--surface-2);color:var(--ink-dim);}
+.alert button{background:none;border:none;color:inherit;font-weight:700;cursor:pointer;font-size:15px;line-height:1;padding:0 2px;}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--shadow);}
+.controls{display:flex;flex-direction:column;gap:12px;}
+.day-scroller{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+.day-chip{
+  font-family:var(--font-mono);font-size:12px;font-weight:600;flex:0 0 auto;padding:8px 12px;border-radius:10px;
+  border:1px solid var(--border);background:var(--bg);color:var(--ink);cursor:pointer;white-space:nowrap;
+}
+.day-chip[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand);}
+.day-chip:disabled{opacity:.35;cursor:not-allowed;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.select-wrap{display:flex;flex-direction:column;gap:5px;}
+.select-wrap label{font-size:12px;font-weight:600;color:var(--ink-dim);}
+select{
+  font-family:var(--font-mono);font-size:15px;padding:9px 10px;border-radius:9px;border:1px solid var(--border);
+  background:var(--bg);color:var(--ink);width:100%;
+}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--ink-dim);}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+.dot.free{background:var(--free);}
+.dot.busy{background:var(--busy);}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:9px;}
+.tile{
+  border-radius:10px;border:1px solid var(--border);padding:10px 4px;display:flex;flex-direction:column;
+  align-items:center;gap:3px;cursor:pointer;background:var(--free-bg);
+}
+.tile .code{font-family:var(--font-mono);font-weight:600;font-size:15px;color:var(--ink);}
+.tile .state{font-size:10px;color:var(--free);font-weight:600;}
+.tile.free{background:var(--free-bg);}
+.tile.busy{background:var(--busy-bg);cursor:not-allowed;}
+.tile.busy .state{color:var(--busy);font-size:9px;line-height:1.2;text-align:center;}
+.tile.selected{outline:2px solid var(--accent);outline-offset:1px;}
+.tile:disabled{color:inherit;}
+
+.confirm-panel{display:flex;flex-direction:column;gap:12px;border-color:var(--accent);}
+.confirm-panel .spot-code{font-family:var(--font-mono);font-size:20px;font-weight:600;color:var(--brand);}
+.confirm-rows{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--ink-dim);}
+.confirm-rows b{color:var(--ink);font-family:var(--font-mono);}
+.confirm-actions{display:flex;gap:10px;}
+.confirm-actions .btn{flex:1;}
+
+.mine-counter{font-size:14px;color:var(--ink-dim);}
+.mine-counter b{font-family:var(--font-mono);color:var(--ink);}
+.section-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);margin-top:4px;}
+.booking-list{display:flex;flex-direction:column;gap:10px;}
+.booking-row{border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--surface);}
+.booking-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.booking-spot{font-family:var(--font-mono);font-weight:600;font-size:16px;}
+.status-pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;}
+.status-pill.active{background:var(--free-bg);color:var(--free);}
+.status-pill.current{background:var(--accent);color:var(--accent-ink);}
+.status-pill.done{background:var(--surface-2);color:var(--ink-dim);}
+.status-pill.cancelled{background:var(--busy-bg);color:var(--busy);}
+.booking-time{font-family:var(--font-mono);font-size:13px;color:var(--ink-dim);}
+.booking-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.cancel-note{font-size:12px;color:var(--ink-dim);}
+.empty-note{color:var(--ink-dim);font-size:14px;padding:12px 2px;}
+</style>
+
+<div class="page" id="app">
+
+  <section class="auth-screen" id="screen-gate">
+    <form class="auth-card" id="gate-form" novalidate>
+      <span class="auth-kicker">ЖК «Атлант»</span>
+      <h1>Парковка жильцов</h1>
+      <p class="lead">Доступ только для жильцов дома. Введите код доступа, который вам сообщили в чате ЖК.</p>
+      <div class="field">
+        <label for="gate-code">Код доступа</label>
+        <input id="gate-code" name="code" type="text" autocomplete="off" placeholder="жк_атлант_2026" required>
+      </div>
+      <p class="form-error" id="gate-error" role="alert"></p>
+      <button class="btn" type="submit">Продолжить</button>
+    </form>
+  </section>
+
+  <section class="auth-screen" id="screen-identify" hidden>
+    <form class="auth-card" id="identify-form" novalidate>
+      <span class="auth-kicker">Шаг 2 из 2</span>
+      <h1>Квартира и телефон</h1>
+      <p class="lead">Нужно один раз, дальше приложение запомнит вас на этом устройстве.</p>
+      <div class="field">
+        <label for="id-apt">Номер квартиры</label>
+        <input id="id-apt" name="apt" type="number" inputmode="numeric" min="1" step="1" placeholder="45" required>
+      </div>
+      <div class="field">
+        <label for="id-phone">Контактный телефон</label>
+        <input id="id-phone" name="phone" type="tel" autocomplete="tel" placeholder="+7 701 000 00 00" required>
+        <span class="hint">Не показывается другим жильцам.</span>
+      </div>
+      <p class="form-error" id="identify-error" role="alert"></p>
+      <button class="btn" type="submit">Войти в приложение</button>
+    </form>
+  </section>
+
+  <section id="screen-main" hidden>
+    <div class="topbar">
+      <div class="brand">
+        <span class="name">Атлант · Парковка</span>
+        <span class="sub">20 мест · A1–A20 · время Алматы</span>
+      </div>
+      <div class="topbar-right">
+        <span class="apt-chip" id="apt-chip">кв. —</span>
+        <button class="btn secondary small" id="btn-logout" type="button">Выйти</button>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab-btn" id="tab-btn-avail" role="tab" aria-selected="true" type="button">Доступность</button>
+      <button class="tab-btn" id="tab-btn-mine" role="tab" aria-selected="false" type="button">Мои брони <span class="badge" id="mine-badge"></span></button>
+    </div>
+
+    <div class="alert" id="alert-box" role="alert" hidden></div>
+
+    <section id="panel-avail">
+      <div class="card controls">
+        <div class="day-scroller" id="day-scroller" role="group" aria-label="Выбор даты"></div>
+        <div class="row2">
+          <div class="select-wrap">
+            <label for="time-select">Начало</label>
+            <select id="time-select"></select>
+          </div>
+          <div class="select-wrap">
+            <label for="duration-select">Длительность</label>
+            <select id="duration-select"></select>
+          </div>
+        </div>
+        <div class="legend">
+          <span><span class="dot free"></span>свободно</span>
+          <span><span class="dot busy"></span>занято</span>
+        </div>
+      </div>
+
+      <div id="grid-wrap" style="margin-top:14px;">
+        <div class="grid" id="spot-grid"></div>
+      </div>
+
+      <div class="card confirm-panel" id="confirm-panel" hidden style="margin-top:14px;">
+        <div class="spot-code" id="confirm-spot"></div>
+        <div class="confirm-rows" id="confirm-rows"></div>
+        <div class="confirm-actions">
+          <button class="btn secondary" id="confirm-cancel" type="button">Отмена</button>
+          <button class="btn" id="confirm-book" type="button">Забронировать</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-mine" hidden>
+      <p class="mine-counter" id="mine-counter"></p>
+      <div class="section-title">Предстоящие и текущие</div>
+      <div class="booking-list" id="mine-upcoming"></div>
+      <div class="section-title">Завершённые и отменённые</div>
+      <div class="booking-list" id="mine-history"></div>
+    </section>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var ACCESS_HASH = "d13aecd9ffbf1424179809971850ffd83a7f69c22ad60bb868f7bd078f123a15";
+  var ACCESS_FALLBACK_B64 = "0LbQul/QsNGC0LvQsNC90YJfMjAyNg==";
+  var ALM_OFFSET = 5*60*60*1000;
+  var HORIZON_DAYS = 14;
+  var SPOTS = [];
+  for(var i=1;i<=20;i++) SPOTS.push("A"+i);
+
+  /* ---------- time helpers (Almaty = UTC+5, no DST) ---------- */
+  function pad(n){ return String(n).padStart(2,"0"); }
+  function toAlmaty(ms){
+    var d = new Date(ms + ALM_OFFSET);
+    return {y:d.getUTCFullYear(), mo:d.getUTCMonth(), da:d.getUTCDate(), h:d.getUTCHours(), mi:d.getUTCMinutes(), wd:d.getUTCDay()};
+  }
+  function wallToMs(y,mo,da,h,mi){ return Date.UTC(y,mo,da,h,mi) - ALM_OFFSET; }
+  function fmtDate(ms){ var a=toAlmaty(ms); return pad(a.da)+"."+pad(a.mo+1)+"."+a.y; }
+  function fmtTime(ms){ var a=toAlmaty(ms); return pad(a.h)+":"+pad(a.mi); }
+  function fmtDateTime(ms){ return fmtDate(ms)+", "+fmtTime(ms); }
+  function almatyToday(){ var t=toAlmaty(Date.now()); return {y:t.y, mo:t.mo, da:t.da}; }
+  function addDays(ymd, offset){
+    var d = new Date(Date.UTC(ymd.y, ymd.mo, ymd.da));
+    d.setUTCDate(d.getUTCDate()+offset);
+    return {y:d.getUTCFullYear(), mo:d.getUTCMonth(), da:d.getUTCDate()};
+  }
+  var WD = ["вс","пн","вт","ср","чт","пт","сб"];
+  function hoursLabel(n){
+    var n100=n%100, n10=n%10;
+    if(n100>=11 && n100<=14) return n+" часов";
+    if(n10===1) return n+" час";
+    if(n10>=2 && n10<=4) return n+" часа";
+    return n+" часов";
+  }
+
+  async function sha256Hex(str){
+    var buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    var arr = Array.from(new Uint8Array(buf));
+    return arr.map(function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+  }
+
+  async function checkAccessCode(normalized){
+    try{
+      if(window.crypto && window.crypto.subtle){
+        var hex = await sha256Hex(normalized);
+        return hex === ACCESS_HASH;
+      }
+    }catch(e){}
+    // Fallback for contexts without Web Crypto (e.g. insecure/local preview).
+    try{
+      var plain = decodeURIComponent(escape(atob(ACCESS_FALLBACK_B64)));
+      return normalized === plain;
+    }catch(e){ return false; }
+  }
+
+  /* ---------- storage ---------- */
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
+
+  /* ---------- dom refs ---------- */
+  var screenGate = document.getElementById("screen-gate");
+  var screenIdentify = document.getElementById("screen-identify");
+  var screenMain = document.getElementById("screen-main");
+  var gateForm = document.getElementById("gate-form");
+  var gateError = document.getElementById("gate-error");
+  var identifyForm = document.getElementById("identify-form");
+  var identifyError = document.getElementById("identify-error");
+  var aptChip = document.getElementById("apt-chip");
+  var btnLogout = document.getElementById("btn-logout");
+  var tabBtnAvail = document.getElementById("tab-btn-avail");
+  var tabBtnMine = document.getElementById("tab-btn-mine");
+  var mineBadge = document.getElementById("mine-badge");
+  var panelAvail = document.getElementById("panel-avail");
+  var panelMine = document.getElementById("panel-mine");
+  var alertBox = document.getElementById("alert-box");
+  var dayScroller = document.getElementById("day-scroller");
+  var timeSelect = document.getElementById("time-select");
+  var durationSelect = document.getElementById("duration-select");
+  var spotGrid = document.getElementById("spot-grid");
+  var gridWrap = document.getElementById("grid-wrap");
+  var confirmPanel = document.getElementById("confirm-panel");
+  var confirmSpot = document.getElementById("confirm-spot");
+  var confirmRows = document.getElementById("confirm-rows");
+  var confirmCancelBtn = document.getElementById("confirm-cancel");
+  var confirmBookBtn = document.getElementById("confirm-book");
+  var mineCounter = document.getElementById("mine-counter");
+  var mineUpcoming = document.getElementById("mine-upcoming");
+  var mineHistory = document.getElementById("mine-history");
+
+  /* ---------- state ---------- */
+  var myApt = null;
+  var dbCap = null, userCap = null, canWriteData = null;
+  var activeBookings = [];   // all apartments, status active
+  var myBookings = [];       // this apartment, all statuses
+  var unsubActive = null, unsubMine = null;
+  var selectedDayOffset = 0;
+  var selectedStartMs = null;
+  var selectedDuration = 1;
+  var selectedSpot = null;
+  var confirmingCancelId = null;
+  var clientHolder = "c_" + Math.random().toString(36).slice(2) + Date.now();
+  var alertTimer = null;
+
+  function showAlert(type, msg, autoHideMs){
+    alertBox.className = "alert alert-" + type;
+    alertBox.innerHTML = "<span>" + msg + "</span><button type=\"button\" aria-label=\"Закрыть\">×</button>";
+    alertBox.hidden = false;
+    alertBox.querySelector("button").onclick = hideAlert;
+    clearTimeout(alertTimer);
+    if(autoHideMs){ alertTimer = setTimeout(hideAlert, autoHideMs); }
+  }
+  function hideAlert(){ alertBox.hidden = true; }
+
+  /* ---------- screens ---------- */
+  function showScreen(name){
+    screenGate.hidden = name !== "gate";
+    screenIdentify.hidden = name !== "identify";
+    screenMain.hidden = name !== "main";
+  }
+
+  gateForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var raw = document.getElementById("gate-code").value || "";
+    var normalized = raw.trim().toLowerCase();
+    checkAccessCode(normalized).then(function(ok){
+      if(ok){
+        lsSet("parking_code_ok", "1");
+        gateError.textContent = "";
+        if(lsGet("parking_apt")){ myApt = lsGet("parking_apt"); showScreen("main"); boot(); }
+        else { showScreen("identify"); }
+      } else {
+        gateError.textContent = "Код не подошёл. Проверьте и попробуйте снова.";
+      }
+    });
+  });
+
+  identifyForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var aptVal = document.getElementById("id-apt").value.trim();
+    var phoneVal = document.getElementById("id-phone").value.trim();
+    if(!/^[1-9][0-9]*$/.test(aptVal)){
+      identifyError.textContent = "Укажите номер квартиры целым числом.";
+      return;
+    }
+    var digits = phoneVal.replace(/\D/g, "");
+    if(!/^[0-9+\-()\s]+$/.test(phoneVal) || digits.length < 7 || digits.length > 15){
+      identifyError.textContent = "Проверьте номер телефона (7–15 цифр).";
+      return;
+    }
+    identifyError.textContent = "";
+    lsSet("parking_apt", aptVal);
+    lsSet("parking_phone", phoneVal);
+    myApt = aptVal;
+    showScreen("main");
+    boot();
+  });
+
+  btnLogout.addEventListener("click", function(){
+    if(unsubActive) unsubActive();
+    if(unsubMine) unsubMine();
+    lsDel("parking_code_ok"); lsDel("parking_apt"); lsDel("parking_phone");
+    location.reload();
+  });
+
+  /* ---------- tabs ---------- */
+  tabBtnAvail.addEventListener("click", function(){ setTab("avail"); });
+  tabBtnMine.addEventListener("click", function(){ setTab("mine"); });
+  function setTab(tab){
+    var isAvail = tab === "avail";
+    tabBtnAvail.setAttribute("aria-selected", isAvail ? "true" : "false");
+    tabBtnMine.setAttribute("aria-selected", isAvail ? "false" : "true");
+    panelAvail.hidden = !isAvail;
+    panelMine.hidden = isAvail;
+  }
+
+  /* ---------- boot ---------- */
+  function boot(){
+    aptChip.textContent = "кв. " + myApt;
+    buildDayScroller();
+    buildDurationSelect();
+    selectDay(0);
+    renderGrid();
+    renderMine();
+    initCapabilities();
+    setInterval(function(){ renderGrid(); renderMine(); }, 5000);
+  }
+
+  function buildDayScroller(){
+    var today = almatyToday();
+    dayScroller.innerHTML = "";
+    for(var off=0; off<=HORIZON_DAYS; off++){
+      var day = addDays(today, off);
+      var slots = buildSlots(day);
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "day-chip";
+      btn.setAttribute("aria-pressed", off === selectedDayOffset ? "true" : "false");
+      var label;
+      if(off===0) label = "Сегодня";
+      else if(off===1) label = "Завтра";
+      else label = WD[addDayWeekday(day)] + " " + day.da + "." + pad(day.mo+1);
+      btn.textContent = label;
+      btn.disabled = slots.length === 0;
+      btn.dataset.offset = String(off);
+      btn.addEventListener("click", function(){ selectDay(parseInt(this.dataset.offset,10)); });
+      dayScroller.appendChild(btn);
+    }
+  }
+  function addDayWeekday(ymd){
+    return new Date(Date.UTC(ymd.y, ymd.mo, ymd.da)).getUTCDay();
+  }
+
+  function buildSlots(day){
+    var now = Date.now();
+    var maxStart = now + HORIZON_DAYS*24*3600000;
+    var slots = [];
+    for(var m=0; m<24*60; m+=15){
+      var h = Math.floor(m/60), mi = m%60;
+      var startMs = wallToMs(day.y, day.mo, day.da, h, mi);
+      if(startMs >= now && startMs <= maxStart){ slots.push({h:h, mi:mi, startMs:startMs}); }
+    }
+    return slots;
+  }
+
+  function selectDay(offset){
+    selectedDayOffset = offset;
+    Array.prototype.forEach.call(dayScroller.querySelectorAll(".day-chip"), function(btn){
+      btn.setAttribute("aria-pressed", parseInt(btn.dataset.offset,10) === offset ? "true" : "false");
+    });
+    var today = almatyToday();
+    var day = addDays(today, offset);
+    var slots = buildSlots(day);
+    timeSelect.innerHTML = "";
+    slots.forEach(function(s){
+      var opt = document.createElement("option");
+      opt.value = String(s.startMs);
+      opt.textContent = pad(s.h) + ":" + pad(s.mi);
+      timeSelect.appendChild(opt);
+    });
+    if(slots.length){ selectedStartMs = slots[0].startMs; timeSelect.value = String(selectedStartMs); }
+    else { selectedStartMs = null; }
+    clearSelection();
+    renderGrid();
+  }
+
+  timeSelect.addEventListener("change", function(){
+    selectedStartMs = parseInt(timeSelect.value, 10);
+    clearSelection();
+    renderGrid();
+  });
+
+  function buildDurationSelect(){
+    durationSelect.innerHTML = "";
+    for(var h=1; h<=25; h++){
+      var opt = document.createElement("option");
+      opt.value = String(h);
+      opt.textContent = hoursLabel(h);
+      durationSelect.appendChild(opt);
+    }
+    durationSelect.value = "1";
+  }
+  durationSelect.addEventListener("change", function(){
+    selectedDuration = parseInt(durationSelect.value, 10);
+    clearSelection();
+    renderGrid();
+  });
+
+  function currentInterval(){
+    if(selectedStartMs == null) return null;
+    selectedDuration = parseInt(durationSelect.value, 10) || 1;
+    return {startMs: selectedStartMs, endMs: selectedStartMs + selectedDuration*3600000};
+  }
+
+  /* ---------- capabilities ---------- */
+  async function initCapabilities(){
+    try{
+      dbCap = (window.claude && window.claude.use) ? await window.claude.use("db") : null;
+    }catch(e){ dbCap = null; }
+    try{
+      userCap = (window.claude && window.claude.use) ? await window.claude.use("user") : null;
+    }catch(e){ userCap = null; }
+    if(userCap){
+      try{ canWriteData = await userCap.can("data.write"); }catch(e){ canWriteData = null; }
+    }
+    if(!dbCap){
+      showAlert("warn", "Общая база данных этого ЖК недоступна в этом окне. Доступность мест и брони не загружены — откройте страницу в аккаунте Claude с доступом «Соавтор» или выше.", 0);
+      renderGrid();
+      renderMine();
+      return;
+    }
+    if(canWriteData === false){
+      showAlert("info", "Доступ только для просмотра: бронирование недоступно без прав «Соавтор» и выше.", 0);
+    }
+    subscribeBookings();
+  }
+
+  function subscribeBookings(){
+    unsubActive = dbCap.collection("bookings").where("status","==","active").onSnapshot(function(snap){
+      activeBookings = snap.docs.map(function(d){ var b = d.data() || {}; b.id = d.id; return b; });
+      renderGrid();
+    }, function(err){
+      showAlert("error", "Не удалось получить данные о бронях: " + err.message, 0);
+    });
+
+    unsubMine = dbCap.collection("bookings").where("apt","==",myApt).onSnapshot(function(snap){
+      myBookings = snap.docs.map(function(d){ var b = d.data() || {}; b.id = d.id; return b; });
+      myBookings.sort(function(a,b){ return b.startMs - a.startMs; });
+      renderMine();
+    }, function(err){
+      showAlert("error", "Не удалось получить ваши брони: " + err.message, 0);
+    });
+  }
+
+  /* ---------- availability grid ---------- */
+  function spotStatus(code, startMs, endMs){
+    var overlaps = activeBookings.filter(function(b){
+      return b.spotId === code && b.startMs < endMs && b.endMs > startMs;
+    });
+    if(overlaps.length === 0) return {free:true};
+    var until = Math.max.apply(null, overlaps.map(function(b){ return b.endMs; }));
+    return {free:false, until:until};
+  }
+
+  function renderGrid(){
+    var interval = currentInterval();
+    if(!dbCap){
+      spotGrid.innerHTML = "<p class=\"empty-note\">Нет подключения к общей базе данных.</p>";
+      return;
+    }
+    if(!interval){
+      spotGrid.innerHTML = "<p class=\"empty-note\">Для выбранного дня нет доступного времени в пределах 14 дней.</p>";
+      return;
+    }
+    spotGrid.innerHTML = "";
+    SPOTS.forEach(function(code){
+      var st = spotStatus(code, interval.startMs, interval.endMs);
+      var tile = document.createElement("button");
+      tile.type = "button";
+      tile.className = "tile " + (st.free ? "free" : "busy") + (selectedSpot === code ? " selected" : "");
+      if(st.free){
+        tile.innerHTML = "<span class=\"code\">" + code + "</span><span class=\"state\">свободно</span>";
+        tile.disabled = canWriteData === false;
+        tile.addEventListener("click", function(){ selectSpot(code, interval.startMs, interval.endMs); });
+      } else {
+        tile.innerHTML = "<span class=\"code\">" + code + "</span><span class=\"state\">до " + fmtDateTime(st.until) + "</span>";
+        tile.disabled = true;
+      }
+      spotGrid.appendChild(tile);
+    });
+  }
+
+  function selectSpot(code, startMs, endMs){
+    selectedSpot = code;
+    renderGrid();
+    confirmPanel.hidden = false;
+    confirmSpot.textContent = "Место " + code;
+    confirmRows.innerHTML =
+      "<div>Начало: <b>" + fmtDateTime(startMs) + "</b></div>" +
+      "<div>Окончание: <b>" + fmtDateTime(endMs) + "</b></div>" +
+      "<div>Длительность: <b>" + hoursLabel(selectedDuration) + "</b></div>";
+    confirmBookBtn.disabled = false;
+    confirmBookBtn.textContent = "Забронировать";
+  }
+
+  function clearSelection(){
+    selectedSpot = null;
+    confirmPanel.hidden = true;
+  }
+  confirmCancelBtn.addEventListener("click", clearSelection);
+
+  confirmBookBtn.addEventListener("click", function(){
+    var interval = currentInterval();
+    if(!interval || !selectedSpot) return;
+    createBooking(selectedSpot, interval.startMs, interval.endMs, selectedDuration);
+  });
+
+  async function createBooking(spotId, startMs, endMs, hours){
+    if(!dbCap){ showAlert("error", "Нет подключения к базе данных.", 0); return; }
+
+    var activeCountLocal = myBookings.filter(function(b){ return b.status === "active" && b.endMs > Date.now(); }).length;
+    if(activeCountLocal >= 3){
+      showAlert("warn", "У квартиры уже 3 активные брони. Отмените одну из существующих, чтобы создать новую.", 0);
+      return;
+    }
+
+    confirmBookBtn.disabled = true;
+    confirmBookBtn.textContent = "Бронируем…";
+
+    try{
+      var lockRef = dbCap.doc("locks/" + spotId);
+      var lease = await lockRef.acquire({holder: clientHolder, ttlMs: 8000});
+      if(!lease.acquired){
+        showAlert("warn", "Это место сейчас бронирует другой жилец. Попробуйте ещё раз через несколько секунд или выберите другое место.", 0);
+        confirmBookBtn.disabled = false;
+        confirmBookBtn.textContent = "Забронировать";
+        return;
+      }
+
+      var spotSnap = await dbCap.collection("bookings").where("spotId","==",spotId).where("status","==","active").get();
+      var overlap = spotSnap.docs.some(function(d){
+        var b = d.data();
+        return b.startMs < endMs && b.endMs > startMs;
+      });
+      if(overlap){
+        showAlert("warn", "Место уже забронировано на это время. Выберите другое место или время.", 0);
+        confirmBookBtn.disabled = false;
+        confirmBookBtn.textContent = "Забронировать";
+        renderGrid();
+        return;
+      }
+
+      var aptSnap = await dbCap.collection("bookings").where("apt","==",myApt).where("status","==","active").get();
+      var activeCount = aptSnap.docs.filter(function(d){ return d.data().endMs > Date.now(); }).length;
+      if(activeCount >= 3){
+        showAlert("warn", "У квартиры уже 3 активные брони. Отмените одну из существующих, чтобы создать новую.", 0);
+        confirmBookBtn.disabled = false;
+        confirmBookBtn.textContent = "Забронировать";
+        return;
+      }
+
+      var uid = null;
+      if(userCap){ try{ uid = await userCap.id(); }catch(e){ uid = null; } }
+
+      await dbCap.collection("bookings").add({
+        spotId: spotId, startMs: startMs, endMs: endMs, hours: hours,
+        apt: myApt, uid: uid, status: "active", createdMs: Date.now(), cancelledMs: null
+      });
+
+      clearSelection();
+      showAlert("success", "Бронь подтверждена: место " + spotId + ", " + fmtDateTime(startMs) + " – " + fmtTime(endMs) + ".", 5000);
+    }catch(e){
+      if(e && e.code === "invalid_argument"){
+        showAlert("error", "Нет прав на запись. Нужен доступ уровня «Соавтор» и выше к этой странице.", 0);
+      } else {
+        showAlert("error", "Не удалось создать бронь. Попробуйте снова.", 0);
+      }
+      confirmBookBtn.disabled = false;
+      confirmBookBtn.textContent = "Забронировать";
+    }
+  }
+
+  /* ---------- my bookings ---------- */
+  function statusInfo(b){
+    var now = Date.now();
+    if(b.status === "cancelled") return {key:"cancelled", label:"Отменена"};
+    if(now >= b.startMs && now < b.endMs) return {key:"current", label:"Текущая"};
+    if(now >= b.endMs) return {key:"done", label:"Завершена"};
+    return {key:"active", label:"Предстоящая"};
+  }
+
+  function renderMine(){
+    var now = Date.now();
+    var activeCount = myBookings.filter(function(b){ return b.status === "active" && b.endMs > now; }).length;
+    mineBadge.textContent = dbCap ? (activeCount + "/3") : "";
+    mineCounter.innerHTML = "Активных броней: <b>" + activeCount + " из 3</b>";
+
+    if(!dbCap){
+      mineUpcoming.innerHTML = "<p class=\"empty-note\">Нет подключения к общей базе данных.</p>";
+      mineHistory.innerHTML = "";
+      return;
+    }
+
+    var upcoming = myBookings.filter(function(b){ return b.status === "active" && b.endMs > now; })
+      .sort(function(a,b){ return a.startMs - b.startMs; });
+    var history = myBookings.filter(function(b){ return !(b.status === "active" && b.endMs > now); })
+      .sort(function(a,b){ return b.startMs - a.startMs; });
+
+    mineUpcoming.innerHTML = upcoming.length ? "" : "<p class=\"empty-note\">Пока нет предстоящих броней.</p>";
+    upcoming.forEach(function(b){ mineUpcoming.appendChild(renderBookingRow(b, true)); });
+
+    mineHistory.innerHTML = history.length ? "" : "<p class=\"empty-note\">История пуста.</p>";
+    history.forEach(function(b){ mineHistory.appendChild(renderBookingRow(b, false)); });
+  }
+
+  function renderBookingRow(b, allowCancel){
+    var now = Date.now();
+    var info = statusInfo(b);
+    var row = document.createElement("div");
+    row.className = "booking-row";
+
+    var canCancel = allowCancel && b.status === "active" && (now <= b.startMs - 30*60000);
+    var cancelNote = "";
+    if(allowCancel && b.status === "active" && !canCancel){
+      cancelNote = (now >= b.startMs) ? "Бронь уже началась — отмена недоступна." : "Отмена недоступна: осталось меньше 30 минут до начала.";
+    }
+
+    row.innerHTML =
+      "<div class=\"booking-top\">" +
+        "<span class=\"booking-spot\">" + b.spotId + "</span>" +
+        "<span class=\"status-pill " + info.key + "\">" + info.label + "</span>" +
+      "</div>" +
+      "<div class=\"booking-time\">" + fmtDateTime(b.startMs) + " – " + fmtTime(b.endMs) + " (" + hoursLabel(b.hours) + ")</div>" +
+      "<div class=\"booking-actions\"></div>";
+
+    var actions = row.querySelector(".booking-actions");
+
+    if(confirmingCancelId === b.id){
+      var sure = document.createElement("span");
+      sure.className = "cancel-note";
+      sure.textContent = "Точно отменить бронь " + b.spotId + "? ";
+      actions.appendChild(sure);
+      var yes = document.createElement("button");
+      yes.className = "btn small"; yes.type = "button"; yes.textContent = "Да, отменить";
+      yes.addEventListener("click", function(){ cancelBooking(b.id); });
+      var no = document.createElement("button");
+      no.className = "btn secondary small"; no.type = "button"; no.textContent = "Нет";
+      no.addEventListener("click", function(){ confirmingCancelId = null; renderMine(); });
+      actions.appendChild(yes); actions.appendChild(no);
+    } else if(canCancel){
+      var cancelBtn = document.createElement("button");
+      cancelBtn.className = "btn secondary small"; cancelBtn.type = "button"; cancelBtn.textContent = "Отменить";
+      cancelBtn.disabled = canWriteData === false;
+      cancelBtn.addEventListener("click", function(){ confirmingCancelId = b.id; renderMine(); });
+      actions.appendChild(cancelBtn);
+    } else if(cancelNote){
+      var note = document.createElement("span");
+      note.className = "cancel-note";
+      note.textContent = cancelNote;
+      actions.appendChild(note);
+    }
+
+    return row;
+  }
+
+  async function cancelBooking(id){
+    if(!dbCap) return;
+    try{
+      await dbCap.collection("bookings").doc(id).update({status:"cancelled", cancelledMs: Date.now()});
+      confirmingCancelId = null;
+      showAlert("success", "Бронь отменена. Место свободно.", 4000);
+    }catch(e){
+      showAlert("error", "Не удалось отменить бронь. Попробуйте снова.", 0);
+    }
+  }
+
+  /* ---------- init ---------- */
+  function init(){
+    myApt = lsGet("parking_apt");
+    var codeOk = lsGet("parking_code_ok") === "1";
+    if(codeOk && myApt){ showScreen("main"); boot(); }
+    else if(codeOk){ showScreen("identify"); }
+    else { showScreen("gate"); }
+  }
+
+  init();
+})();
+</script>
